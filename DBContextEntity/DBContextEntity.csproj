@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SqlServer\**" />
+    <EmbeddedResource Remove="SqlServer\**" />
+    <None Remove="SqlServer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AntData.Core" Version="1.2.9" />
+    <PackageReference Include="AntData.Core.Mysql" Version="1.2.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Mysql\EntityRobotForMysql.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>EntityRobotForMysql.generated.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Mysql\EntityRobotForMysql.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EntityRobotForMysql.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

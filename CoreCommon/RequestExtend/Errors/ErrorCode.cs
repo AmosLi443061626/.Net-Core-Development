@@ -1,0 +1,36 @@
+﻿namespace CoreCommon.RequestExtend.Errors
+{
+    public enum ErrorCode
+    {
+        UnauthenticatedError, 
+        UnknownError,
+        DownstreampathTemplateAlreadyUsedError,
+        UnableToFindDownstreamRouteError,
+        CannotAddDataError,
+        CannotFindDataError,
+        UnableToCompleteRequestError,
+        UnableToCreateAuthenticationHandlerError,
+        UnsupportedAuthenticationProviderError,
+        CannotFindClaimError,
+        ParsingConfigurationHeaderError,
+        NoInstructionsError,
+        InstructionNotForClaimsError,
+        UnauthorizedError,
+        ClaimValueNotAuthorisedError,
+        ScopeNotAuthorisedError,
+        UserDoesNotHaveClaimError,
+        DownstreamPathTemplateContainsSchemeError,
+        DownstreamPathNullOrEmptyError,
+        DownstreamSchemeNullOrEmptyError,
+        DownstreamHostNullOrEmptyError,
+        ServicesAreNullError,
+        ServicesAreEmptyError,
+        UnableToFindServiceDiscoveryProviderError,
+        UnableToFindLoadBalancerError,
+        RequestTimedOutError,
+        UnableToFindQoSProviderError,
+        UnableToSetConfigInConsulError,
+        UnmappableRequestError,
+        RateLimitOptionsError
+    }
+}

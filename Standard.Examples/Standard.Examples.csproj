@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AntData.Core" Version="1.3.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreCommon\CoreCommon.csproj" />
+    <ProjectReference Include="..\DBContextEntity\DBContextEntity.csproj" />
+    <ProjectReference Include="..\IStandard.Examples\IStandard.Examples.csproj" />
+  </ItemGroup>
+
+</Project>

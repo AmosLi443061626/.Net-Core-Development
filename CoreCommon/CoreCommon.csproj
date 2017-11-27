@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Logs\NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.1" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.2.1" />
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
+    <PackageReference Include="Castle.Core" Version="4.1.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.4.1" />
+    <PackageReference Include="Grpc" Version="1.7.1" />
+    <PackageReference Include="Grpc.Core" Version="1.7.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
+<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis.Core" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="NLog" Version="5.0.0-beta11" />
+    <PackageReference Include="Polly" Version="5.5.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="4.1.3" />
+    <PackageReference Include="System.Interactive.Async" Version="3.1.1" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EtcdGrpcClient\" />
+  </ItemGroup>
+
+</Project>

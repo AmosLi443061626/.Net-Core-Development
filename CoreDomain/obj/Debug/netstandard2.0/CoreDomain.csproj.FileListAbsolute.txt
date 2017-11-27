@@ -1,0 +1,9 @@
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\bin\Debug\netstandard2.0\CoreDomain.deps.json
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\bin\Debug\netstandard2.0\CoreDomain.dll
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\bin\Debug\netstandard2.0\CoreDomain.pdb
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\obj\Debug\netstandard2.0\CoreDomain.csprojResolveAssemblyReference.cache
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\obj\Debug\netstandard2.0\CoreDomain.csproj.CoreCompileInputs.cache
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\obj\Debug\netstandard2.0\CoreDomain.AssemblyInfoInputs.cache
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\obj\Debug\netstandard2.0\CoreDomain.AssemblyInfo.cs
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\obj\Debug\netstandard2.0\CoreDomain.dll
+E:\z_job\NewYbl\Code\NetCore\startup\CoreDomain\obj\Debug\netstandard2.0\CoreDomain.pdb
