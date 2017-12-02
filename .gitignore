@@ -6,3 +6,9 @@ DBContextEntity/obj/
 IStandard.Examples/obj/
 Standard.Examples/obj/
 startup/obj/
+Standard.Examples/bin/
+startup/bin/
+CoreCommon/bin/
+CoreDomain/bin/
+DBContextEntity/bin/
+IStandard.Examples/bin/
