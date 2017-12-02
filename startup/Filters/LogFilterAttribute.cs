@@ -35,25 +35,26 @@ namespace startup.Filters
             }
             else
             {
-                _logRequest.ResponseBodys = context.Exception.ToString();
-                context.ExceptionHandled = true;
                 Result result = null;
-
                 if (context.Exception is ChecksException ce) //验证异常(业务)
                 {
                     result = Result.Fail(ce.Code, ce.Message);
+                    _logRequest.ResponseBodys = result.ToJson();
                     LogSuccess();
                 }
                 else if (context.Exception is QueueException qe) //消息队列异常(业务)
                 {
                     result = Result.Fail(qe.Code, qe.Message);
+                    _logRequest.ResponseBodys = result.ToJson();
                     LogSuccess();
                 }
                 else
                 {
+                    _logRequest.ResponseBodys = context.Exception.ToString();
                     result = Result.Fail(500, "服务器连接错误");
                     Log.Error(LogFormat.Record("startupExpection", (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, DateTime.Now, _logRequest));
                 }
+                context.ExceptionHandled = true;
                 context.Result = new ObjectResult(result.ToJson());
             }
         }

@@ -106,7 +106,8 @@ namespace CoreCommon.Ioc
                     var subs = attrs.Where(x => x.GetType() == typeof(TopSubscribeAttribute));
                     foreach (var item in subs)
                     {
-                        _consumerExecutorDescriptor.Add(new ConsumerExecutorDescriptor { MethodInfo = methodInfo, Attribute = (TopSubscribeAttribute)item, ImplTypeInfo = typeInfo });
+                        if (((TopSubscribeAttribute)item).IsStart)
+                            _consumerExecutorDescriptor.Add(new ConsumerExecutorDescriptor { MethodInfo = methodInfo, Attribute = (TopSubscribeAttribute)item, ImplTypeInfo = typeInfo });
                     }
                 }
             }

@@ -151,7 +151,10 @@ namespace CoreCommon.MessageMQ.MQS
                 var mList = mExecutor as List<ConsumerExecutorDescriptor>;
 
                 var ced = mList.FirstOrDefault(x => x.MethodInfo.Name == receive.Name);
-
+                if (ced == null && mList.Count > 0)
+                {
+                    ced = mList[0];
+                }
                 if (ced != null)
                 {
                     object reflect = Activator.CreateInstance(ced.ImplTypeInfo);

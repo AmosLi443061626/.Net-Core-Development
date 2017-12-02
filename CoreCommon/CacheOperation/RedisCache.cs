@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CoreCommon.CacheOperation
 {
-    public class RedisCache: ICache
+    public class RedisCache : ICache
     {
         public RedisCache()
         { }
@@ -18,18 +18,18 @@ namespace CoreCommon.CacheOperation
             return StackExchangeRedisHelper.Instance().Get(key);
         }
 
-        public T Get<T>(string key,bool isDelay=false, int seconds = 30)
+        public T Get<T>(string key, bool isDelay = false, int seconds = 30)
         {
-            if(isDelay)
+            if (isDelay)
                 StackExchangeRedisHelper.Instance().SetExpire(key, seconds);
-            return StackExchangeRedisHelper.Instance().Get<T>( key);
+            return StackExchangeRedisHelper.Instance().Get<T>(key);
         }
 
-        public bool Set<T>(string key,T value,int seconds = 30)
+        public bool Set<T>(string key, T value, int seconds = 30)
         {
-            bool flag= StackExchangeRedisHelper.Instance().Set(key, value.ToJson());
-            if(seconds > 0)
-                StackExchangeRedisHelper.Instance().SetExpire( key, seconds);
+            bool flag = StackExchangeRedisHelper.Instance().Set(key, value.ToJson());
+            if (seconds > 0)
+                StackExchangeRedisHelper.Instance().SetExpire(key, seconds);
             return flag;
         }
 
@@ -39,6 +39,12 @@ namespace CoreCommon.CacheOperation
             if (seconds > 0)
                 StackExchangeRedisHelper.Instance().SetExpire(key, seconds);
             return flag;
+        }
+
+        public bool Delete(string key)
+        {
+            StackExchangeRedisHelper.Instance().Remove(key);
+            return true;
         }
     }
 }

@@ -62,7 +62,7 @@ namespace CoreCommon.Configs
             if (refValue == null)
             {
                 refValue = new List<string>();
-                refValue.Add("");//[0]
+                refValue.Add(GetValue(key));//[0]
                 _dicCache.TryAdd(key, refValue);
             }
             return refValue;

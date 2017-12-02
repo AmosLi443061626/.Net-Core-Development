@@ -35,7 +35,12 @@ namespace CoreCommon.Ioc.AOPAttribute
         /// </summary>
         public int Retries { get; set; }
 
-        public TopSubscribeAttribute(string name, string group = null, int expiresSecond = 0, int retries = 0)
+        /// <summary>
+        /// 消费者是否启动
+        /// </summary>
+        public bool IsStart { get; set; }
+
+        public TopSubscribeAttribute(string name, string group = null, int expiresSecond = 0, int retries = 0, bool isStart = true)
         {
             Name = name;
             ExpiresAtSecond = expiresSecond;
@@ -44,6 +49,7 @@ namespace CoreCommon.Ioc.AOPAttribute
                 Group = group;
             }
             Retries = retries;
+            IsStart = isStart;
         }
 
         public override void OnExcuting(IInvocation invocation)
@@ -57,7 +63,17 @@ namespace CoreCommon.Ioc.AOPAttribute
                 Retries = Retries
             }.ToJson());
 
-            invocation.ReturnValue = result.Succeeded ? Result.Success() : Result.Fail(88888, "消息发送失败");
+
+            if (result.Succeeded)
+            {
+                var obj = Activator.CreateInstance(invocation.MethodInvocationTarget.ReturnType, new object[] { true, null, 0, null });
+                invocation.ReturnValue = obj;
+            }
+            else
+            {
+                var obj = Activator.CreateInstance(invocation.MethodInvocationTarget.ReturnType, new object[] { false, "操作失败", 99999, null });
+                invocation.ReturnValue = obj;
+            }
             Debug.WriteLine("消息队列执行前");
         }
 

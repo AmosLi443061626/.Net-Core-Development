@@ -39,11 +39,21 @@ namespace CoreCommon.Results
             };
         }
 
-        public static Result Success(String msg)
+        public static Result Success(String data)
         {
             return new Result
             {
                 success = true,
+                data = data
+            };
+        }
+
+        public static Result Success(String data, string msg)
+        {
+            return new Result
+            {
+                success = true,
+                data = data,
                 msg = msg
             };
         }
@@ -87,7 +97,7 @@ namespace CoreCommon.Results
 
         public Result() { }
 
-        public Result(bool success,string msg,int code,T data)
+        public Result(bool success, string msg, int code, T data)
         {
             this.success = success;
             this.msg = msg;

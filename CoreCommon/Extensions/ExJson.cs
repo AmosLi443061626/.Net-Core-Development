@@ -120,5 +120,31 @@ namespace CoreCommon.Extensions
             }
             return dicdata.ToJson();
         }
+
+        /// <summary>
+        ///   n1=value1&n2=value2  转Json 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        static public Dictionary<string, string> ToDictionary(this string s)
+        {
+            Dictionary<string, string> dicdata = new Dictionary<string, string>();
+            try
+            {
+                var data = s.Split('&');
+                for (int i = 0; i < data.Length; i++)
+                {
+                    var dk = data[i].Split('=');
+                    StringBuilder sb = new StringBuilder(dk[1]);
+                    for (int j = 2; j <= dk.Length - 1; j++)
+                        sb.Append(dk[j]);
+                    dicdata.Add(dk[0], sb.ToString());
+                }
+            }
+            catch
+            {
+            }
+            return dicdata;
+        }
     }
 }

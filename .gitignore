@@ -1,0 +1,8 @@
+.vs/
+AllTests/obj/
+CoreCommon/obj/
+CoreDomain/obj/
+DBContextEntity/obj/
+IStandard.Examples/obj/
+Standard.Examples/obj/
+startup/obj/
