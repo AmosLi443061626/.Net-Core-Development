@@ -65,7 +65,7 @@
 <br/>
 
 ###### 第一步： &nbsp;&nbsp;&nbsp;&nbsp;使用ORM工具生成数据库模型
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DB -> EntityRobotForMysql.tt 中 LoadMySqlMetadata("连接字符串") 配置生成模型的数据库连接字符串,然后保存生成数据模型 <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DB -> EntityRobotForMysql.tt 中 LoadMySqlMetadata("连接字符串") 配置生成模型的数据库连接字符串,然后保存生成数据模型 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;ORM 确定不能满足的情况下,请在DBContextEntity 项目中新建类,进行T-SQL编写,编写后调用;  <br/> 
 &nbsp;&nbsp;&nbsp;&nbsp;ORM: 使用方式请查看 
 ## https://github.com/yuzd/AntData.ORM 
