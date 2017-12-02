@@ -16,7 +16,8 @@
 	<li>IStandard.Examples (接口层)</li>
 	<li>Standard.Examples  (实现层)</li>
 </ul>
-###### DB(DB层)
+
+##### DB(DB层)
 <ul>
 	<li>DBContextEntity:qlServer/Mysql 模型生成层及默认DB初始化层
 	<br/> +mysql文件夹下：EntityRobotForMysql.tt 保存(Ctrl+S)即生成数据库模型;EntityRobotForMysql.tt中LoadMySqlMetadata <br/> 
@@ -61,7 +62,8 @@
 
 ##### 所有的程序统一使用Ioc管理,要是程序生效，必须先到Program中注册
 <br/>
-##### 第一步： &nbsp;&nbsp;&nbsp;&nbsp;使用ORM工具生成数据库模型:  <br/>
+
+###### 第一步： &nbsp;&nbsp;&nbsp;&nbsp;使用ORM工具生成数据库模型
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DB -> EntityRobotForMysql.tt 中 LoadMySqlMetadata("连接字符串") 配置生成模型的数据库连接字符串,然后保存生成数据模型 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;ORM 确定不能满足的情况下,请在DBContextEntity 项目中新建类,进行T-SQL编写,编写后调用;  <br/> 
 &nbsp;&nbsp;&nbsp;&nbsp;ORM: 使用方式请查看 
@@ -71,4 +73,6 @@
 
 ###### 第三步: 编写业务及开放业务接口(方法统一返回参数:Result): <br/>
 
+ <br/> ==
+ 
 ###### Docker + k8s + .Net Core + Etcd  -> Pass
