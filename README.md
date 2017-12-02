@@ -23,9 +23,10 @@
 ("连接字符串") 配置生成模型的数据库连接字符串 	
 	</li>
 </ul>
-###### Domain(Model层) 
+
+##### Domain(Model层) 
 <ul>
-	<li>+Domains:业务model</li>
+	<li>Domains:业务model</li>
 </ul>
 
 ###### Infrastructure(基础服务) 
@@ -60,18 +61,14 @@
 
 ##### 所有的程序统一使用Ioc管理,要是程序生效，必须先到Program中注册
 <br/>
-###### 第一步：<br/> 
-使用ORM工具生成数据库模型:  <br/>
-     DB -> EntityRobotForMysql.tt 中 LoadMySqlMetadata("连接字符串") 配置生成模型的数据库连接字符串,然后保存生成数据模型 <br/>
-ORM 确定不能满足的情况下,请在DBContextEntity 项目中新建类,进行T-SQL编写,编写后调用;  <br/> 
-ORM:使用方式请查看 <br/>
-https://github.com/yuzd/AntData.ORM <br/>
+##### 第一步： &nbsp;&nbsp;&nbsp;&nbsp;使用ORM工具生成数据库模型:  <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DB -> EntityRobotForMysql.tt 中 LoadMySqlMetadata("连接字符串") 配置生成模型的数据库连接字符串,然后保存生成数据模型 <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;ORM 确定不能满足的情况下,请在DBContextEntity 项目中新建类,进行T-SQL编写,编写后调用;  <br/> 
+&nbsp;&nbsp;&nbsp;&nbsp;ORM: 使用方式请查看 
+## https://github.com/yuzd/AntData.ORM 
 
-###### 第二步：<br/>
-修改数据库连接字符串：<br/>
-    4_Infrastructure(基础服务)->Configs->ConfigManagerConf <br/>
+###### 第二步：Infrastructure(基础服务)->Configs->ConfigManagerConf 设置Mysql连接字符串<br/>
 
-###### 第三步:  \<br>
-编写业务及开放业务接口(方法统一返回参数:Result): <br/>
+###### 第三步: 编写业务及开放业务接口(方法统一返回参数:Result): <br/>
 
 ###### Docker + k8s + .Net Core + Etcd  -> Pass
