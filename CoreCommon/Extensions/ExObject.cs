@@ -156,5 +156,25 @@ namespace CoreCommon.Extensions
             }
             return "1949-10-01";
         }
+
+        /// <summary>
+        /// 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+        /// </summary>
+        /// <param name="param">需要拼接的数组</param>
+        /// <returns>拼接完成以后的字符串</returns>
+        public static string ToParamsString<T>(this T param) where T : IDictionary<string, string>
+        {
+            var TEnum = param.GetEnumerator();
+            StringBuilder prestr = new StringBuilder();
+            if (TEnum.MoveNext())
+            {
+                prestr.Append(TEnum.Current.Key + "=" + TEnum.Current.Value);
+                while (TEnum.MoveNext())
+                {
+                    prestr.Append("&" + TEnum.Current.Key + "=" + TEnum.Current.Value);
+                }
+            }
+            return prestr.ToString();
+        }
     }
 }
