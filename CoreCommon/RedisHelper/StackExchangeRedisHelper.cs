@@ -46,13 +46,14 @@ namespace CoreCommon.RedisHelper
     {
         private static object _locker = new Object();
         private static StackExchangeRedisHelper _instance = null;
+        private static Redlock redlock = null;
         public static StackExchangeRedisHelper Instance()
         {
             if (_instance == null)
             {
                 lock (_locker)
                 {
-                    if (_instance == null || _instance._conn.IsConnected==false)
+                    if (_instance == null || _instance._conn.IsConnected == false)
                     {
                         _instance = new StackExchangeRedisHelper();
                     }
@@ -63,12 +64,12 @@ namespace CoreCommon.RedisHelper
 
         private ConnectionMultiplexer _conn;
 
-       private  string connStr = string.Format("{0}:{1},allowAdmin=true,password={2},defaultdatabase={3}",
-     ConfigManagerConf.GetValue("redis:HostName"),
-     ConfigManagerConf.GetValue("redis:Port"),
-     ConfigManagerConf.GetValue("redis:Password"),
-     ConfigManagerConf.GetValue("redis:Defaultdatabase")
-     );
+        private string connStr = string.Format("{0}:{1},allowAdmin=true,password={2},defaultdatabase={3}",
+      ConfigManagerConf.GetValue("redis:HostName"),
+      ConfigManagerConf.GetValue("redis:Port"),
+      ConfigManagerConf.GetValue("redis:Password"),
+      ConfigManagerConf.GetValue("redis:Defaultdatabase")
+      );
         /// <summary>
         /// 使用一个静态属性来返回已连接的实例，如下列中所示。这样，一旦 ConnectionMultiplexer 断开连接，便可以初始化新的连接实例。
         /// </summary>
@@ -82,6 +83,7 @@ namespace CoreCommon.RedisHelper
             //_instance.HashSlotMoved += MuxerHashSlotMoved;
             //_instance.InternalError += MuxerInternalError;
             _conn = ConnectionMultiplexer.Connect(connStr);
+            redlock = new Redlock(_conn);
         }
 
 
@@ -98,7 +100,7 @@ namespace CoreCommon.RedisHelper
             }
         }
 
-        public bool SetExpire(string key,int seconds)
+        public bool SetExpire(string key, int seconds)
         {
             return GetDatabase().KeyExpire(key, DateTime.Now.AddSeconds(seconds));
         }
@@ -284,7 +286,7 @@ namespace CoreCommon.RedisHelper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private  void MuxerConnectionFailed(object sender, ConnectionFailedEventArgs e)
+        private void MuxerConnectionFailed(object sender, ConnectionFailedEventArgs e)
         {
             //LogHelper.WriteInfoLog("重新连接：Endpoint failed: " + e.EndPoint + ", " + e.FailureType + (e.Exception == null ? "" : (", " + e.Exception.Message)));
         }
@@ -293,7 +295,7 @@ namespace CoreCommon.RedisHelper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private  void MuxerHashSlotMoved(object sender, HashSlotMovedEventArgs e)
+        private void MuxerHashSlotMoved(object sender, HashSlotMovedEventArgs e)
         {
             //LogHelper.WriteInfoLog("HashSlotMoved:NewEndPoint" + e.NewEndPoint + ", OldEndPoint" + e.OldEndPoint);
         }
@@ -302,7 +304,7 @@ namespace CoreCommon.RedisHelper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private  void MuxerInternalError(object sender, InternalErrorEventArgs e)
+        private void MuxerInternalError(object sender, InternalErrorEventArgs e)
         {
             //LogHelper.WriteInfoLog("InternalError:Message" + e.Exception.Message);
         }
@@ -386,6 +388,11 @@ namespace CoreCommon.RedisHelper
         //    EndPoint[] endpoints = Instance.GetEndPoints();
         //    return endpoints;
         //}
+
+        public Redlock GetRedlock()
+        {
+            return redlock;
+        }
     }
 }
 
