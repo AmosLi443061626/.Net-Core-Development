@@ -12,3 +12,4 @@ CoreCommon/bin/
 CoreDomain/bin/
 DBContextEntity/bin/
 IStandard.Examples/bin/
+AllTests/bin/
