@@ -18,7 +18,6 @@ namespace CoreCommon.Extensions
                 // Rewind, so the core is not lost when it looks the body for the request
                 request.Body.Position = 0;
                 var result = new StreamReader(request.Body).ReadToEnd();
-                request.Body.Position = 0;
                 return result;
             }
             catch (Exception)
