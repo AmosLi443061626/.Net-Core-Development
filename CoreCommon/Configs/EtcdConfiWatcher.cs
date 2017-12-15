@@ -36,7 +36,7 @@ namespace CoreCommon.Configs
                 {
                     try
                     {
-                        await WatchValues(cd);
+                        WatchValues(cd);
                     }
                     catch { }
                 }
@@ -44,15 +44,15 @@ namespace CoreCommon.Configs
             }
         }
 
-        private async
-        Task
+        private void
 WatchValues(ConcurrentDictionary<string, List<string>> cd)
         {
             try
             {
                 var dk = etcdClient.GetRange(conf).Result;
                 foreach (var item in dk)
-                    cd.AddOrUpdate(item.Key.Replace(conf, ""), new List<string> { item.Value }, (key, value) => {
+                    cd.AddOrUpdate(item.Key.Replace(conf, ""), new List<string> { item.Value }, (key, value) =>
+                    {
                         value[0] = item.Value;
                         return value;
                     });
@@ -60,13 +60,14 @@ WatchValues(ConcurrentDictionary<string, List<string>> cd)
             catch
             {
                 foreach (var item in cd)
-                    await etcdClient.Put(conf + item.Key, item.Value[0]);
+                     etcdClient.Put(conf + item.Key, item.Value[0]).Wait();
             }
             watcher = etcdClient.WatchRange(conf).Result;
             watcher.Subscribe(s =>
             {
                 foreach (var item in s)
-                    cd.AddOrUpdate(item.Key.Replace(conf, ""), new List<string> { item.Value }, (key, value) => {
+                    cd.AddOrUpdate(item.Key.Replace(conf, ""), new List<string> { item.Value }, (key, value) =>
+                    {
                         value[0] = item.Value;
                         return value;
                     });
