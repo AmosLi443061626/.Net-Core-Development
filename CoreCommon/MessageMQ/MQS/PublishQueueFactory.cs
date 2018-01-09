@@ -1,4 +1,5 @@
-﻿using CoreCommon.Logs;
+﻿using CoreCommon.Extensions;
+using CoreCommon.Logs;
 using CoreCommon.MessageMQ.MQS.RabbitMQ;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace CoreCommon.MessageMQ.MQS
                 }
                 catch (Exception ex)
                 {
-                    Log.Fatal(LogFormat.Record("RabbitmqPublishException", 0, DateTime.Now, new { keyName = keyName, content = content, exception = ex.ToString() }));
+                    Log.Debug(new LogFormat(new { keyName = keyName, content = content }.ToJson(), "rabbitmq", "publish", "error", 500, 0,ex.ToString(), "", ""));
                     return OperateResult.Failed(ex);
                 }
             }

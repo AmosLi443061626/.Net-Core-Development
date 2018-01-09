@@ -10,31 +10,31 @@ namespace CoreCommon.Logs
 
         public static void Debug(LogFormat content)
         {
-            content._sysFlag = "debug";
+            content.level = "DEBUG";
             _logger.Debug(content.ToJson());
         } 
 
         public static void Info(LogFormat content)
         {
-            content._sysFlag = "info";
+            content.level = "INFO";
             _logger.Info(content.ToJson());
         }
 
         public static void Warn(LogFormat content)
         {
-            content._sysFlag = "warn";
+            content.level = "WARN";
             _logger.Warn(content.ToJson());
         }
 
         public static void Error(LogFormat content)
         {
-            content._sysFlag = "error";
+            content.level = "ERROR";
             _logger.Error(content.ToJson());
         }
 
         public static void Fatal(LogFormat content)
         {
-            content._sysFlag = "fatal";
+            content.level = "FATAL";
             _logger.Fatal(content.ToJson());
         }
     }

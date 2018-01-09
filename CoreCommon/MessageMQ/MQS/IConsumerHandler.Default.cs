@@ -99,7 +99,7 @@ namespace CoreCommon.MessageMQ.MQS
                         if (receive.ExpiresAt > expiresTime && receive.ExpiresAt < DateTime.Now)
                         {
                             //超时未消费队列
-                            Log.Info(LogFormat.Record("RabbitmqOvertime", 0, DateTime.Now, message));
+                            Log.Warn(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "overtime", 500, 0, "", "", ""));
                         }
                         else
                         {
@@ -110,12 +110,13 @@ namespace CoreCommon.MessageMQ.MQS
                                 StoreMessage(message, receive); //抛出异常 进入重试机制
 
                                 stopwatch.Stop();
-                                Log.Info(LogFormat.Record("RabbitmqQueue", stopwatch.ElapsedMilliseconds, DateTime.Now, message));
+
+                                Log.Info(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "queue", 200, stopwatch.ElapsedMilliseconds.ConvertToIntSafe(), "", "", ""));
                             }
                             catch (Exception ex)
                             {
                                 stopwatch.Stop();
-                                Log.Info(LogFormat.Record("RabbitmqQueueException", stopwatch.ElapsedMilliseconds, DateTime.Now, new { message = message, ex = ex.ToString() }));
+                                Log.Error(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "error", 500, stopwatch.ElapsedMilliseconds.ConvertToIntSafe(), ex.ToString(), "", ""));
                                 throw ex;
                             }
                         }
@@ -130,7 +131,7 @@ namespace CoreCommon.MessageMQ.MQS
                         else
                         {
                             //失败队列记录
-                            Log.Warn(LogFormat.Record("RabbitmqQueueFail", 0, DateTime.Now, message));
+                            Log.Warn(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "overtime", 500, 0, "", "", ""));
                         }
                     }
                     client.Commit();

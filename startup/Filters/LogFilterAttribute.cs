@@ -52,7 +52,7 @@ namespace startup.Filters
                 {
                     _logRequest.ResponseBodys = context.Exception.ToString();
                     result = Result.Fail(500, "服务器连接错误");
-                    Log.Error(LogFormat.Record("startupExpection", (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, DateTime.Now, _logRequest));
+                    Log.Error(new LogFormat(_logRequest.ToJson(), "services.pay", "http", "controller", 500, (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, "", _logRequest.Url, ""));
                 }
                 context.ExceptionHandled = true;
                 context.Result = new ObjectResult(result.ToJson());
@@ -64,7 +64,7 @@ namespace startup.Filters
         /// </summary>
         private void LogSuccess()
         {
-            Log.Info(LogFormat.Record("startup", (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, DateTime.Now, _logRequest));
+            Log.Info(new LogFormat(_logRequest.ToJson(), "services.pay", "http", "controller", 200, (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, "", _logRequest.Url, ""));
         }
     }
 }

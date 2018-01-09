@@ -62,7 +62,7 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
                                          basicProperties: null,
                                          body: body);
                 }
-                Log.Info(LogFormat.Record("PublishQueue", 0, DateTime.Now, new { keyName = keyName, content = content }));
+                Log.Debug(new LogFormat(new { keyName = keyName, content = content }.ToJson(), "rabbitmq", "publish", "info", 500, 0, "", "", ""));
                 return Task.FromResult(OperateResult.Success);
             }
             catch (Exception ex)
