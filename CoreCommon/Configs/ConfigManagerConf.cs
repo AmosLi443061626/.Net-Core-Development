@@ -68,6 +68,11 @@ namespace CoreCommon.Configs
             return refValue;
         }
 
+        public static bool Set(string key, string value)
+        {
+            return etcdConfiWatcher.Set(key, value);
+        }
+
         public static IDictionary<string, string> GetWatcherAll()
         {
             return etcdConfiWatcher.GetAll();

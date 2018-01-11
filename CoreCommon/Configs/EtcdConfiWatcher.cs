@@ -60,7 +60,7 @@ WatchValues(ConcurrentDictionary<string, List<string>> cd)
             catch
             {
                 foreach (var item in cd)
-                     etcdClient.Put(conf + item.Key, item.Value[0]).Wait();
+                    etcdClient.Put(conf + item.Key, item.Value[0]).Wait();
             }
             watcher = etcdClient.WatchRange(conf).Result;
             watcher.Subscribe(s =>
@@ -77,6 +77,20 @@ WatchValues(ConcurrentDictionary<string, List<string>> cd)
         public IDictionary<string, string> GetAll()
         {
             return etcdClient.GetRange("/").Result;
+        }
+
+        public bool Set(string key, string value)
+        {
+            try
+            {
+                var req = etcdClient.Put(conf + key, value).Result;
+            }
+            catch
+            {
+
+                return false;
+            }
+            return true;
         }
 
         public void Dispose()
