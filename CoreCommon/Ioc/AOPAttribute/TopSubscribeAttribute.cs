@@ -17,15 +17,14 @@ namespace CoreCommon.Ioc.AOPAttribute
     public class TopSubscribeAttribute : BaseAspectAttribute
     {
         /// <summary>
-        /// topic or exchange route key name.
+        /// 队列名称
         /// </summary>
         public string Name { get; }
 
         /// <summary>
-        /// kafak --> groups.id
-        /// rabbitmq --> queue.name
+        /// 分组 /区域
         /// </summary>
-        public string Group { get; set; } = "core.default.group";
+        public string Group { get; set; }
         /// <summary>
         /// 过期时间秒
         /// </summary>
@@ -46,7 +45,7 @@ namespace CoreCommon.Ioc.AOPAttribute
             ExpiresAtSecond = expiresSecond;
             if (!string.IsNullOrEmpty(group))
             {
-                Group = group;
+                //Group = group;
             }
             Retries = retries;
             IsStart = isStart;
@@ -56,12 +55,13 @@ namespace CoreCommon.Ioc.AOPAttribute
         {
             var result = PublishQueueFactory.factory.PublishAsync(Name, new PublishedMessage
             {
-                Id = Guid.NewGuid().GenerateUniqueID(),
-                Name = invocation.Method.Name,
-                Content = invocation.Arguments.ToJson(),
-                ExpiresAt = ExpiresAtSecond > 0 ? DateTime.Now.AddSeconds(ExpiresAtSecond) : new DateTime(1949, 10, 01),
-                Retries = Retries
-            }.ToJson());
+                rid = Guid.NewGuid().GenerateUniqueID(),
+                msgBeanJson = invocation.Arguments.ToJson(),
+                exchangeName = Group ,
+                queueName = Name,
+                timeout = ExpiresAtSecond > 0 ? DateTime.Now.AddSeconds(ExpiresAtSecond) : DateTime.Now.AddDays(30),
+                maxNum = Retries
+            });
 
 
             if (result.Succeeded)

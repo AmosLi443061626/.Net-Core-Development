@@ -23,11 +23,10 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
 
         private string[] _hostNames;
 
-        public RabbitMQConsumerClient(string queueName, RabbitMQOptions options)
+        public RabbitMQConsumerClient(string queueName,  RabbitMQOptions options)
         {
             _queueName = queueName;
             _rabbitMQOptions = options;
-            _exchageName = options.TopicExchangeName;
 
             InitClient();
         }
@@ -49,7 +48,7 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _hostNames = _rabbitMQOptions.HostName.Split(',');
             _connection = _connectionFactory.CreateConnection(_hostNames);
             _channel = _connection.CreateModel();
-            _channel.ExchangeDeclare(exchange: _exchageName, type: RabbitMQOptions.ExchangeType);
+            _channel.ExchangeDeclare(exchange: _rabbitMQOptions.TopicExchangeName, type: RabbitMQOptions.ExchangeType, durable: true);
             _channel.QueueDeclare(_queueName, exclusive: false, durable: true, autoDelete: false);
         }
 
@@ -60,8 +59,9 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _channel.BasicConsume(_queueName, false, consumer);
             while (!cancellationToken.IsCancellationRequested)
             {
-                try { 
-                Task.Delay(timeout, cancellationToken).Wait();
+                try
+                {
+                    Task.Delay(timeout, cancellationToken).Wait();
                 }
                 catch { }
             }
@@ -69,12 +69,12 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
 
         public void Subscribe(string topic)
         {
-            _channel.QueueBind(_queueName, _exchageName, topic);
+            _channel.QueueBind(_queueName, _rabbitMQOptions.TopicExchangeName, topic);
         }
 
         public void Subscribe(string topic, int partition)
         {
-            _channel.QueueBind(_queueName, _exchageName, topic);
+            _channel.QueueBind(_queueName, _rabbitMQOptions.TopicExchangeName, topic);
         }
 
         public void Commit()
@@ -93,7 +93,7 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _deliveryTag = e.DeliveryTag;
             var message = new MessageContext
             {
-                Group = _queueName,
+                Group = _exchageName,
                 Name = e.RoutingKey,
                 Content = Encoding.UTF8.GetString(e.Body)
             };

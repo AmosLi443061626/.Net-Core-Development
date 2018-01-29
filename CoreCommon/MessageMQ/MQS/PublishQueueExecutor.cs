@@ -6,6 +6,7 @@ using RabbitMQ.Client;
 using CoreCommon.Extensions;
 using CoreCommon.Configs;
 using CoreCommon.Logs;
+using CoreCommon.MessageMQ.Models;
 
 namespace CoreCommon.MessageMQ.MQS.RabbitMQ
 {
@@ -35,7 +36,7 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _hostNames = ConfigManagerConf.GetValue("rabbitmq:HostName").Split(',');
         }
 
-        public Task<OperateResult> PublishAsync(string keyName, string content)
+        public Task<OperateResult> PublishAsync(string keyName, string group, string content)
         {
             var factory = new ConnectionFactory()
             {
@@ -56,13 +57,12 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
                 {
                     var body = Encoding.UTF8.GetBytes(content);
 
-                    channel.ExchangeDeclare(_rabbitMQOptions.TopicExchangeName, RabbitMQOptions.ExchangeType);
+                    channel.ExchangeDeclare(_rabbitMQOptions.TopicExchangeName, RabbitMQOptions.ExchangeType, durable: true);
                     channel.BasicPublish(exchange: _rabbitMQOptions.TopicExchangeName,
                                          routingKey: keyName,
                                          basicProperties: null,
                                          body: body);
                 }
-                Log.Debug(new LogFormat(new { keyName = keyName, content = content }.ToJson(), "rabbitmq", "publish", "info", 500, 0, "", "", ""));
                 return Task.FromResult(OperateResult.Success);
             }
             catch (Exception ex)

@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Logs\NLog.config" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -38,6 +34,10 @@
 
   <ItemGroup>
     <Folder Include="EtcdGrpcClient\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="CoreCommon.csproj" />
   </ItemGroup>
 
 </Project>

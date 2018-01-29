@@ -69,7 +69,7 @@ namespace CoreCommon.Results
             return new Result<T>
             {
                 success = true,
-                data = data
+                Data = data
             };
         }
 
@@ -80,7 +80,7 @@ namespace CoreCommon.Results
                 success = false,
                 msg = msg,
                 code = code,
-                data = data
+                Data = data
             };
         }
     }
@@ -93,6 +93,7 @@ namespace CoreCommon.Results
     {
         /// <summary>数据
         /// </summary>
+        public T Data { get; set; }
 
         public Result() { }
 
@@ -101,7 +102,7 @@ namespace CoreCommon.Results
             this.success = success;
             this.msg = msg;
             this.code = code;
-            this.data = data;
+            this.Data = data;
         }
 
         /// <summary>失败
@@ -129,7 +130,7 @@ namespace CoreCommon.Results
             {
                 success = false,
                 msg = msg,
-                data = data,
+                Data = data,
                 code = code
             };
         }
@@ -145,7 +146,7 @@ namespace CoreCommon.Results
             {
                 success = true,
                 msg = msg,
-                data = data
+                Data = data
             };
         }
 

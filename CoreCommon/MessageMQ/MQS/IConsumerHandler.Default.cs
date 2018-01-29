@@ -11,6 +11,8 @@ using System.Linq;
 using CoreCommon.Results;
 using CoreCommon.Logs;
 using System.Diagnostics;
+using CoreCommon.CacheOperation;
+using CoreCommon.Ioc;
 
 namespace CoreCommon.MessageMQ.MQS
 {
@@ -50,10 +52,7 @@ namespace CoreCommon.MessageMQ.MQS
                     {
                         RegisterMessageProcessor(client);
 
-                        foreach (var item in matchGroup.Value)
-                        {
-                            client.Subscribe(item.Attribute.Name);
-                        }
+                        client.Subscribe(matchGroup.Value.Attribute.Name);
 
                         client.Listening(_pollingDelay, _cts.Token);
                     }
@@ -93,46 +92,21 @@ namespace CoreCommon.MessageMQ.MQS
             {
                 try
                 {
-                    var receive = message.Content.ToModel<ReceivedMessage>();
+                    var receive = message.Content.ToModel<PublishedMessage>();
                     try
                     {
-                        if (receive.ExpiresAt > expiresTime && receive.ExpiresAt < DateTime.Now)
-                        {
-                            //超时未消费队列
-                            Log.Warn(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "overtime", 500, 0, "", "", ""));
-                        }
-                        else
-                        {
-                            Stopwatch stopwatch = new Stopwatch();
-                            stopwatch.Start();
-                            try
-                            {
-                                StoreMessage(message, receive); //抛出异常 进入重试机制
-
-                                stopwatch.Stop();
-
-                                Log.Info(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "queue", 200, stopwatch.ElapsedMilliseconds.ConvertToIntSafe(), "", "", ""));
-                            }
-                            catch (Exception ex)
-                            {
-                                stopwatch.Stop();
-                                Log.Error(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "error", 500, stopwatch.ElapsedMilliseconds.ConvertToIntSafe(), ex.ToString(), "", ""));
-                                throw ex;
-                            }
-                        }
+                        StoreMessage(message, receive); //抛出异常 进入重试机制
                     }
                     catch
                     {
-                        if (receive.Retries > 0) //重试
+                        receive.consumerNum++;
+                        if (receive.consumerNum >= receive.maxNum)
                         {
-                            receive.Retries -= 1;
-                            PublishQueueFactory.factory.PublishAsync(message.Name, receive.ToJson());
+                            //写入缓存
+                            IocContainer.Container.Get<ICache>().Set($"rabbimq:fail:{receive.queueName}:{receive.rid}", receive.ToJson(), -1);
                         }
                         else
-                        {
-                            //失败队列记录
-                            Log.Warn(new LogFormat(message.ToJson(), "rabbitmq", "consumer", "overtime", 500, 0, "", "", ""));
-                        }
+                            PublishQueueFactory.factory.PublishAsync(message.Name, receive);
                     }
                     client.Commit();
                 }
@@ -142,39 +116,24 @@ namespace CoreCommon.MessageMQ.MQS
 
 
 
-        private Result StoreMessage(MessageContext message, ReceivedMessage receive)
+        private Result StoreMessage(MessageContext message, PublishedMessage receive)
         {
-            var topicExector = _selector.GetTopicExector(message.Name);
+            var queueExector = _selector.GetTopicExector(message.Name);
 
-            var mExecutor = topicExector[message.Group];
-            if (mExecutor != null)
+            if (queueExector != null)
             {
-                var mList = mExecutor as List<ConsumerExecutorDescriptor>;
-
-                var ced = mList.FirstOrDefault(x => x.MethodInfo.Name == receive.Name);
-                if (ced == null && mList.Count > 0)
+                object reflect = Activator.CreateInstance(queueExector.ImplTypeInfo);
+                var methodInfo = queueExector.MethodInfo;
+                var parameters = methodInfo.GetParameters();
+                List<object> objParams = new List<object>();
+                objParams = receive.msgBeanJson.ToModel(objParams);
+                for (int i = 0; i < parameters.Length; i++)
                 {
-                    ced = mList[0];
+                    objParams[i] = objParams[i].ToJson().ToModel(parameters[i].ParameterType);
                 }
-                if (ced != null)
-                {
-                    object reflect = Activator.CreateInstance(ced.ImplTypeInfo);
+                var result = methodInfo.Invoke(reflect, objParams.ToArray()) as Result;
 
-                    var methodInfo = ced.MethodInfo;
-
-                    var parameters = methodInfo.GetParameters();
-
-                    List<object> objParams = new List<object>();
-                    objParams = receive.Content.ToModel(objParams);
-                    for (int i = 0; i < parameters.Length; i++)
-                    {
-                        objParams[i] = objParams[i].ToJson().ToModel(parameters[i].ParameterType);
-                    }
-                    var result = methodInfo.Invoke(reflect, objParams.ToArray()) as Result;
-
-                    Console.WriteLine(result.ToJson());
-                    return result;
-                }
+                return result;
             }
             return Result.Fail(0);
         }

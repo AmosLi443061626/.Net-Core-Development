@@ -1,5 +1,7 @@
-﻿using CoreCommon.Extensions;
+﻿using CoreCommon.Configs;
+using CoreCommon.Extensions;
 using CoreCommon.Logs;
+using CoreCommon.MessageMQ.Models;
 using CoreCommon.MessageMQ.MQS.RabbitMQ;
 using System;
 using System.Collections.Generic;
@@ -13,21 +15,20 @@ namespace CoreCommon.MessageMQ.MQS
 
         public static PublishQueueFactory factory = new PublishQueueFactory();
 
-        public OperateResult PublishAsync(string keyName, string content)
+        public OperateResult PublishAsync(string keyName, PublishedMessage content)
         {
             try
             {
-                return _executor.PublishAsync(keyName, content).Result;
+                return _executor.PublishAsync(keyName, content.exchangeName, content.ToJson()).Result;
             }
             catch
             {
                 try
                 {
-                    return _executor.PublishAsync(keyName, content).Result;
+                    return _executor.PublishAsync(keyName, content.exchangeName, content.ToJson()).Result;
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(new LogFormat(new { keyName = keyName, content = content }.ToJson(), "rabbitmq", "publish", "error", 500, 0,ex.ToString(), "", ""));
                     return OperateResult.Failed(ex);
                 }
             }
