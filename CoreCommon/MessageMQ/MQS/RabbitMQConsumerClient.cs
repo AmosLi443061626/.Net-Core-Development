@@ -18,14 +18,16 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
         private IConnection _connection;
         private IModel _channel;
         private ulong _deliveryTag;
+        private string _topicExchangeName;
 
         public event EventHandler<MessageContext> MessageReceieved;
 
         private string[] _hostNames;
 
-        public RabbitMQConsumerClient(string queueName,  RabbitMQOptions options)
+        public RabbitMQConsumerClient(string queueName, string topicExchangeName, RabbitMQOptions options)
         {
             _queueName = queueName;
+            _topicExchangeName = topicExchangeName;
             _rabbitMQOptions = options;
 
             InitClient();
@@ -48,7 +50,7 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _hostNames = _rabbitMQOptions.HostName.Split(',');
             _connection = _connectionFactory.CreateConnection(_hostNames);
             _channel = _connection.CreateModel();
-            _channel.ExchangeDeclare(exchange: _rabbitMQOptions.TopicExchangeName, type: RabbitMQOptions.ExchangeType, durable: true);
+            _channel.ExchangeDeclare(exchange: _topicExchangeName ?? _rabbitMQOptions.TopicExchangeName, type: RabbitMQOptions.ExchangeType, durable: true);
             _channel.QueueDeclare(_queueName, exclusive: false, durable: true, autoDelete: false);
         }
 
@@ -72,6 +74,11 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _channel.QueueBind(_queueName, _rabbitMQOptions.TopicExchangeName, topic);
         }
 
+        public void Subscribe(string topic, string group)
+        {
+            _channel.QueueBind(_queueName, topic ?? _rabbitMQOptions.TopicExchangeName, group);
+        }
+
         public void Subscribe(string topic, int partition)
         {
             _channel.QueueBind(_queueName, _rabbitMQOptions.TopicExchangeName, topic);
@@ -93,8 +100,8 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             _deliveryTag = e.DeliveryTag;
             var message = new MessageContext
             {
-                Group = _exchageName,
-                Name = e.RoutingKey,
+                Group = e.RoutingKey,
+                Name = _queueName,
                 Content = Encoding.UTF8.GetString(e.Body)
             };
             MessageReceieved?.Invoke(sender, message);

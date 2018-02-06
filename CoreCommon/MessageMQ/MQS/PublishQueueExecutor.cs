@@ -57,8 +57,8 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
                 {
                     var body = Encoding.UTF8.GetBytes(content);
 
-                    channel.ExchangeDeclare(_rabbitMQOptions.TopicExchangeName, RabbitMQOptions.ExchangeType, durable: true);
-                    channel.BasicPublish(exchange: _rabbitMQOptions.TopicExchangeName,
+                    channel.ExchangeDeclare(group ?? _rabbitMQOptions.TopicExchangeName, RabbitMQOptions.ExchangeType, durable: true);
+                    channel.BasicPublish(exchange: group ?? _rabbitMQOptions.TopicExchangeName,
                                          routingKey: keyName,
                                          basicProperties: null,
                                          body: body);

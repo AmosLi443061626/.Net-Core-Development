@@ -29,9 +29,9 @@ namespace CoreCommon.MessageMQ.MQS.RabbitMQ
             };
         }
 
-        public IConsumerClient Create(string queueName)
+        public IConsumerClient Create(string queueName,string exchangeName)
         {
-            return new RabbitMQConsumerClient(queueName,_rabbitMQOptions);
+            return new RabbitMQConsumerClient(queueName, exchangeName,_rabbitMQOptions);
         }
     }
 }

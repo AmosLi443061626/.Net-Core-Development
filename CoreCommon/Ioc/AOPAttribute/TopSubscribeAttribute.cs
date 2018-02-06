@@ -22,13 +22,20 @@ namespace CoreCommon.Ioc.AOPAttribute
         public string Name { get; }
 
         /// <summary>
-        /// 分组 /区域
+        /// 区域名称
+        /// </summary>
+        public string ExchangeName { get; set; }
+
+        /// <summary>
+        /// RouteKey
         /// </summary>
         public string Group { get; set; }
+
         /// <summary>
         /// 过期时间秒
         /// </summary>
         public int ExpiresAtSecond { get; set; }
+
         /// <summary>
         /// 重试次数
         /// </summary>
@@ -39,25 +46,25 @@ namespace CoreCommon.Ioc.AOPAttribute
         /// </summary>
         public bool IsStart { get; set; }
 
-        public TopSubscribeAttribute(string name, string group = null, int expiresSecond = 0, int retries = 0, bool isStart = true)
+        public TopSubscribeAttribute(string name, string group = null, int expiresSecond = 0, int retries = 0, bool isStart = true, string exchangeName = null)
         {
             Name = name;
             ExpiresAtSecond = expiresSecond;
-            if (!string.IsNullOrEmpty(group))
-            {
-                //Group = group;
-            }
+            ExchangeName = exchangeName;
+            Group = Group;
+            if (Group.IsNullOrEmpty())
+                Group = name;
             Retries = retries;
             IsStart = isStart;
         }
 
         public override void OnExcuting(IInvocation invocation)
         {
-            var result = PublishQueueFactory.factory.PublishAsync(Name, new PublishedMessage
+            var result = PublishQueueFactory.factory.PublishAsync(Group, new PublishedMessage
             {
                 rid = Guid.NewGuid().GenerateUniqueID(),
                 msgBeanJson = invocation.Arguments.ToJson(),
-                exchangeName = Group ,
+                exchangeName = ExchangeName,
                 queueName = Name,
                 timeout = ExpiresAtSecond > 0 ? DateTime.Now.AddSeconds(ExpiresAtSecond) : DateTime.Now.AddDays(30),
                 maxNum = Retries

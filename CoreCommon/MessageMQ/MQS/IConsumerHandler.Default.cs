@@ -48,11 +48,11 @@ namespace CoreCommon.MessageMQ.MQS
             {
                 Task.Factory.StartNew(() =>
                 {
-                    using (var client = _consumerClientFactory.Create(matchGroup.Key))
+                    using (var client = _consumerClientFactory.Create(matchGroup.Key, matchGroup.Value.Attribute.ExchangeName))
                     {
                         RegisterMessageProcessor(client);
 
-                        client.Subscribe(matchGroup.Value.Attribute.Name);
+                        client.Subscribe(matchGroup.Value.Attribute.ExchangeName, matchGroup.Value.Attribute.Group);
 
                         client.Listening(_pollingDelay, _cts.Token);
                     }
@@ -106,7 +106,7 @@ namespace CoreCommon.MessageMQ.MQS
                             IocContainer.Container.Get<ICache>().Set($"rabbimq:fail:{receive.queueName}:{receive.rid}", receive.ToJson(), -1);
                         }
                         else
-                            PublishQueueFactory.factory.PublishAsync(message.Name, receive);
+                            PublishQueueFactory.factory.PublishAsync(message.Group, receive);
                     }
                     client.Commit();
                 }
