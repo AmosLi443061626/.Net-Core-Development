@@ -14,6 +14,7 @@ namespace startup.Filters
 {
     public class LogFilterAttribute : Attribute, IActionFilter
     {
+        public LogRequest _logRequest;
 
         public TraceSpan traceSpan;
 
@@ -68,9 +69,9 @@ namespace startup.Filters
                     traceSpan.tags["status"] = "500";
                 }
                 context.ExceptionHandled = true;
-                context.Result = new ObjectResult(result.ToJson());
+                context.Result = new ObjectResult(result);
             }
-
+          
             Log.Info(traceSpan.ToJson());
         }
     }
