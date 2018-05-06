@@ -1,5 +1,6 @@
 ﻿
 using CoreCommon.Extensions;
+using CoreCommon.LinkZipkin;
 using NLog;
 
 namespace CoreCommon.Logs
@@ -8,34 +9,29 @@ namespace CoreCommon.Logs
     {
         private static Logger _logger= LogManager.GetCurrentClassLogger();
 
-        public static void Debug(LogFormat content)
+        public static void Debug(string content)
         {
-            content.level = "DEBUG";
-            _logger.Debug(content.ToJson());
+            _logger.Debug(content);
         } 
 
-        public static void Info(LogFormat content)
+        public static void Info(string content)
         {
-            content.level = "INFO";
-            _logger.Info(content.ToJson());
+            _logger.Info(content);
         }
 
-        public static void Warn(LogFormat content)
+        public static void Warn(string content)
         {
-            content.level = "WARN";
-            _logger.Warn(content.ToJson());
+            _logger.Warn(content);
         }
 
-        public static void Error(LogFormat content)
+        public static void Error(string content)
         {
-            content.level = "ERROR";
-            _logger.Error(content.ToJson());
+            _logger.Error(content);
         }
 
-        public static void Fatal(LogFormat content)
+        public static void Fatal(string content)
         {
-            content.level = "FATAL";
-            _logger.Fatal(content.ToJson());
+            _logger.Fatal(content);
         }
     }
 }

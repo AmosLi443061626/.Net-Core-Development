@@ -1,5 +1,6 @@
 ﻿using CoreCommon.Exceptions;
 using CoreCommon.Extensions;
+using CoreCommon.LinkZipkin;
 using CoreCommon.Logs;
 using CoreCommon.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -14,57 +15,64 @@ namespace startup.Filters
     public class LogFilterAttribute : Attribute, IActionFilter
     {
         public LogRequest _logRequest;
+
+        public TraceSpan traceSpan;
+
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            _logRequest = new LogRequest();
-            _logRequest.Url = $"{context.HttpContext.Request.Host.Value}{context.HttpContext.Request.Path}{context.HttpContext.Request.QueryString}";
-            _logRequest.Headers = context.HttpContext.Request.Headers.ToDictionary(k => k.Key, v => string.Join(";", v.Value.ToList()));
-            _logRequest.ExcuteStartTime = DateTime.Now;
-            _logRequest.RequestBodys = context.HttpContext.Request.ToReadAsyncJson();
-            _logRequest.Cookie = context.HttpContext.Request.Cookies.ToJson();
+            //初始化日志
+            TraceSpan traceSpan = TraceContext.CreateTrace();
+            traceSpan.parentId = context.HttpContext.Request.Headers[ZipkinTraceConstants.HeaderSpanId];
+            var traceId = context.HttpContext.Request.Headers[ZipkinTraceConstants.HseaderTraceId].ToString();
+            if (!traceId.IsNullOrEmpty())
+            {
+                traceSpan.traceId = traceId;
+            }
+            traceSpan.timestamp = DateTime.Now.ToUnixTimestamp();
+            traceSpan.timestamp_millis = DateTime.Now.ToTimestamp();
+            traceSpan.name = context.HttpContext.Request.Path;
+            traceSpan.kind = "SERVER";
+            traceSpan.localEndpoint.serviceName = "pay";
+
+            #region 日志信息
+            traceSpan.tags.Add("http.url", $"{context.HttpContext.Request.Host.Value}");
+            traceSpan.tags.Add("http.path", $"{context.HttpContext.Request.Host.Value}{context.HttpContext.Request.Path}{context.HttpContext.Request.QueryString}");
+            #endregion
+
+            traceSpan.tags.Add("request.body", context.HttpContext.Request.ToReadAsyncJson());
+            traceSpan.tags.Add("group", $"http");
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            _logRequest.ExcuteEndTime = DateTime.Now;
-
-            if (context.Exception == null)
-            {
-                _logRequest.ResponseBodys = (context.Result as ObjectResult).Value.ToJson();
-                LogSuccess();
-            }
-            else
+            traceSpan = TraceContext.Get();
+            traceSpan.duration = DateTime.Now.ToUnixTimestamp() - traceSpan.timestamp; //运行时间
+            traceSpan.tags.Add("status", "200");
+            if (context.Exception != null)
             {
                 Result result = null;
                 if (context.Exception is ChecksException ce) //验证异常(业务)
                 {
                     result = Result.Fail(ce.Code, ce.Message);
-                    _logRequest.ResponseBodys = result.ToJson();
-                    LogSuccess();
+                    traceSpan.tags.Add("checks", context.Exception.ToString());
                 }
                 else if (context.Exception is QueueException qe) //消息队列异常(业务)
                 {
                     result = Result.Fail(qe.Code, qe.Message);
-                    _logRequest.ResponseBodys = result.ToJson();
-                    LogSuccess();
+                    traceSpan.tags.Add("queues", context.Exception.ToString());
+                    traceSpan.tags["status"] = "500";
                 }
                 else
                 {
-                    _logRequest.ResponseBodys = context.Exception.ToString();
                     result = Result.Fail(500, "服务器连接错误");
-                    Log.Error(new LogFormat(_logRequest.ToJson(), "services.pay", "http", "controller", 500, (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, "", _logRequest.Url, ""));
+                    traceSpan.tags.Add("error", context.Exception.ToString());
+                    traceSpan.tags["status"] = "500";
                 }
                 context.ExceptionHandled = true;
-                context.Result = new ObjectResult(result.ToJson());
+                context.Result = new ObjectResult(result);
             }
-        }
-
-        /// <summary>
-        /// 记录成功信息
-        /// </summary>
-        private void LogSuccess()
-        {
-            Log.Info(new LogFormat(_logRequest.ToJson(), "services.pay", "http", "controller", 200, (_logRequest.ExcuteEndTime - _logRequest.ExcuteStartTime).Milliseconds, "", _logRequest.Url, ""));
+          
+            Log.Info(traceSpan.ToJson());
         }
     }
 }

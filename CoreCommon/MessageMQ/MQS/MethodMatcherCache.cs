@@ -9,11 +9,11 @@ namespace CoreCommon.MessageMQ.MQS
     public class MethodMatcherCache
     {
 
-        private ConcurrentDictionary<string, IList<ConsumerExecutorDescriptor>> Entries { get; }
+        private ConcurrentDictionary<string, ConsumerExecutorDescriptor> Entries { get; }
 
         public MethodMatcherCache()
         {
-            Entries = new ConcurrentDictionary<string, IList<ConsumerExecutorDescriptor>>();
+            Entries = new ConcurrentDictionary<string, ConsumerExecutorDescriptor>();
         }
 
         /// <summary>
@@ -21,21 +21,12 @@ namespace CoreCommon.MessageMQ.MQS
         /// the Key is the CAPSubscribeAttribute Group, the Value for the current Group of candidates
         /// </summary>
         /// <param name="provider"><see cref="IServiceProvider"/></param>
-        public ConcurrentDictionary<string, IList<ConsumerExecutorDescriptor>> GetCandidatesMethodsOfGroupNameGrouped(IList<ConsumerExecutorDescriptor> grouped)
+        public ConcurrentDictionary<string, ConsumerExecutorDescriptor> GetCandidatesMethodsOfGroupNameGrouped(List<ConsumerExecutorDescriptor> queueNames)
         {
             if (Entries.Count != 0) return Entries;
-
-            IList<ConsumerExecutorDescriptor> groupd = null;
-
-            foreach (var item in grouped)
+            foreach (var item in queueNames)
             {
-                Entries.TryGetValue(item.Attribute.Group, out groupd);
-                if (groupd==null)
-                {
-                    groupd = new List<ConsumerExecutorDescriptor>();
-                }
-                groupd.Add(item);
-                Entries.TryAdd(item.Attribute.Group, groupd);
+                Entries.TryAdd(item.Attribute.Name,item);
             }
             return Entries;
         }
@@ -45,20 +36,16 @@ namespace CoreCommon.MessageMQ.MQS
         ///  The Key is Group name, the value is specify topic candidates.
         /// </summary>
         /// <param name="topicName">message topic name</param>
-        public IDictionary<string, IList<ConsumerExecutorDescriptor>> GetTopicExector(string topicName)
+        public ConsumerExecutorDescriptor GetTopicExector(string queueName)
         {
             if (Entries == null)
             {
                 throw new ArgumentNullException(nameof(Entries));
             }
 
-            var dic = new Dictionary<string, IList<ConsumerExecutorDescriptor>>();
-            foreach (var item in Entries)
-            {
-                var topicCandidates = item.Value.Where(x => x.Attribute.Name == topicName);
-                dic.Add(item.Key, topicCandidates.ToList());
-            }
-            return dic;
+            ConsumerExecutorDescriptor groupd = null;
+            Entries.TryGetValue(queueName, out groupd);
+            return groupd;
         }
     }
 }
