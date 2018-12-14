@@ -76,4 +76,4 @@
 
  <br/> ==
  
-###### Docker + k8s + .Net Core + Etcd  -> Pass
+###### Docker + k8s + .Net Core + apollo(配置中心)  -> Pass
