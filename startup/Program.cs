@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using CoreCommon.Configs;
 using CoreCommon.Ioc;
+using Microsoft.AspNetCore.Hosting.Internal;
 
 namespace startup
 {
@@ -16,37 +17,40 @@ namespace startup
     {
         public static void Main(string[] args)
         {
+            var core_env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            //根据 <环境变量> 读取不同的配置文件
+            //VS设置调试环境变量: 项目->属性->调试->环境变量
+            //docker -env key=value 设置<环境变量>
             var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())   //指定配置文件所在的目录
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .Build();  //指定加载的配
+            .AddJsonFile($"appsettings.{(string.IsNullOrEmpty(core_env) ? core_env : core_env + ".")}json", optional: true, reloadOnChange: true)
+            .Build();  //加载指定的配置文件<环境变量:ASPNETCORE_ENVIRONMENT>未配置,则读取 appsettings.json
+            Console.WriteLine($"read setting json: appsettings.{(string.IsNullOrEmpty(core_env) ? core_env : core_env + ".")}json");
 
-#if DEBUG //本地运行开发
-            config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())   //指定配置文件所在的目录
-            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-            .Build();
-#endif
-
+            core_env = null;
             #region 初始化区域模块
-            //设置配置文件
+
+
+            //配置中心: 读取appsettings.json -> 可扩展配置中心
+            //读取配置 ConfigManagerConf.GetValue("key")   ,key 使用冒号寻找下级(Core配置文件):  Logging:Debug
             ConfigManagerConf.SetConfiguration(config);//Config配置文件注册
+            Console.WriteLine("read setting end.");
 
-            #region 获取配置文件值(value), 引用类型测试 -> Etcd 及时更新
-            //List<string> kd= ConfigManagerConf.GetReferenceValue("99999");
-            //while (true)
-            //{
-            //    Console.WriteLine(kd[0]);
-            //    Console.WriteLine("按任意键下一次输出");
-            //    Console.ReadLine();
-            //}
-            #endregion
-
+            Console.WriteLine("ioc register start... attribute aop");
             IocContainer.Container.RegisterAssembly("Standard.Examples", "IStandard.Examples"); // Ioc注册  实现dll , 接口类
             IocContainer.Container.Build(); //Ioc 注册后编译
-            IocContainer.Container.RabbitBuild();　//注册rabbitmq
+            Console.WriteLine("ioc register end.");
 
+
+            Console.WriteLine("rabbitmq customer start...");
+            Console.WriteLine("attribute TopSubscribeAttribute loding...");
+            IocContainer.Container.RabbitBuild();　//注册rabbitmq
+            Console.WriteLine("rabbitmq customer end.");
+
+
+            Console.WriteLine("set mysql connection  start.");
             DBContextEntity.DbContext.Configure(ConfigManagerConf.GetValue("DB:mysql"));//mysql连接初始化
+            Console.WriteLine("set mysql connection  end.");
             #endregion
 
             var build = WebHost.CreateDefaultBuilder()
