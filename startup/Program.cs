@@ -22,11 +22,11 @@ namespace startup
             //VS设置调试环境变量: 项目->属性->调试->环境变量
             //docker -env key=value 设置<环境变量>
             var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())   //指定配置文件所在的目录
+            .SetBasePath(Environment.CurrentDirectory)   //指定配置文件所在的目录
             .AddJsonFile($"appsettings.{(string.IsNullOrEmpty(core_env) ? core_env : core_env + ".")}json", optional: true, reloadOnChange: true)
             .Build();  //加载指定的配置文件<环境变量:ASPNETCORE_ENVIRONMENT>未配置,则读取 appsettings.json
             Console.WriteLine($"read setting json: appsettings.{(string.IsNullOrEmpty(core_env) ? core_env : core_env + ".")}json");
-
+            
             core_env = null;
             #region 初始化区域模块
 
